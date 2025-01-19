@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  proxy:
+    build: ./proxy
+    ports:
+      - "8080:8080"
+    depends_on:
+      - classifier
+      - llm
+  classifier:
+    build: ./classifier
+    ports:
+      - "5000:5000"
+  llm:
+    build: ./llm
+    ports:
+      - "8000:8000"
+
