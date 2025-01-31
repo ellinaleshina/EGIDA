@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+import requests
 import httpx
 import uuid
 
@@ -6,8 +7,9 @@ app = Flask(__name__)
 
 GIGACHAT_OAUTH_URL = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
 GIGACHAT_ENDPOINT = "https://gigachat.devices.sberbank.ru/api/v1/"
-GIGACHAT_API_KEY = ""
-
+GIGACHAT_API_KEY = "ODAzN2I3ZWMtZjQ2YS00OTNlLTg2MzktNmI4OTE1NjA1ZmQxOjk5MDgyNWEyLTkxYzctNDQ0OC04ZjE1LTMzOTRmMTA5OTYxMA=="
+URL= 'http://172.18.0.3:8000/respond'
+logger_URL= 'http://172.18.0.4:8025/logger'
 
 def get_api_key(auth_token: str) -> str:
     rq_uid = str(uuid.uuid4())
@@ -45,18 +47,17 @@ def llm_proxy():
     data = request.json
     if not data or "prompt" not in data:
         return jsonify({"error": "Invalid input"}), 400
-
     prompt = data.get("prompt", "")
-
     try:
         classification_result = send_gigachat_request(prompt, GIGACHAT_API_KEY)
+        log_status = requests.post(logger_URL, json={"prompt": prompt, "label": classification_result.lower()})
+        log_status.raise_for_status()
         if classification_result.lower() == "unsafe":
-            return jsonify({"error": "Malicious input detected"}), 400
+            return jsonify({"error": "Malicious input detected"}), 400   
     except Exception as e:
-        return jsonify({"error": "Gigachat service unavailable", "details": str(e)}), 500
-
+       return jsonify({"error": "Gigachat service unavailable", "details": str(e)}), 500
     try:
-        llm_response = requests.post(LLM_URL, json={"prompt": prompt})
+        llm_response = requests.post(URL, json={"prompt": prompt})
         llm_response.raise_for_status()
         return jsonify(llm_response.json())
     except Exception as e:
