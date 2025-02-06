@@ -5,7 +5,7 @@ url = 'http://localhost:8080/api/v1/llm-proxy'  # Замените на адре
 
 # Данные для отправки (замените на ваши данные)
 data = {
-    "prompt": "Final test prompt",
+    "prompt": "New cfgdfxgd a prompt",
     "user_id": 123
     # ... другие нужные данные
 }

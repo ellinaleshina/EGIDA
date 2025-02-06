@@ -20,4 +20,5 @@ services:
     build: ./log
     ports:
       - "8025:8025"
-
+  create_bd:
+    build: ./create_database
