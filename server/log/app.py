@@ -6,7 +6,7 @@ import psycopg2
 from psycopg2 import Error
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import datetime
-host_ip="192.168.159.245"
+host_ip="192.168.31.34"
 app = Flask(__name__)
 @app.route('/logger', methods=['POST'])
 def send_log_to_BD():
@@ -19,20 +19,20 @@ def send_log_to_BD():
                                   # пароль, который указали при установке PostgreSQL
                                   password="postgres",
                                   host=host_ip,
-                                  port="5432",
-                                  database = "promts",
+                                  port="5433",
+                                  database = "log_bd_linux",
                                   options="-c client_encoding=utf8"
                                   )
         connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cursor = connection.cursor()
-        id = 6 #временная заглушка
+        id = 8 #временная заглушка
         if data.get("label", "") == 'unsafe':
             bool_label=False
         else:
             bool_label = True
         new_record = (id, datetime.datetime.now(), bool_label, data.get("prompt", ""))
 
-        postgres_insert_query = """ INSERT INTO promts_table (user_id, time, label, promt)
+        postgres_insert_query = """ INSERT INTO classify_logs (user_id, time, label, promt)
                                        VALUES (%s,%s,%s, %s)"""
         cursor.execute(postgres_insert_query, new_record) #для теста
 
